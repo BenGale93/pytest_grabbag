@@ -1,25 +1,32 @@
 """Grab bag of tools for dealing with temporary files and directories."""
 
+import os
 import typing as t
 from pathlib import Path
 
-import yaml
 from pytest import TempPathFactory, fixture  # noqa: PT013
 
-from pytest_grabbag.exceptions import UnsupportedSerializationError
+from pytest_grabbag._serde import SerializationManager
 
 PathLike = Path | str
 
 AnyDict = dict[str, t.Any]
 
-SERIALIZERS = {
-    ".yaml": yaml.dump,
-    ".yml": yaml.dump,
-}
-
 
 class TempFs(Path):
     """A subclass of Path that makes it easier to generate files and folders for testing."""
+
+    def __init__(self, *args: str | os.PathLike[str]) -> None:
+        """Initialise TempFs instance."""
+        super().__init__(*args)
+        self._serde_manager = SerializationManager()
+
+    def set_serde_kwargs(self, extension: str, **kwargs: t.Any) -> None:
+        """Set the keyword arguments for a serializer.
+
+        You can use this to influence how the output is formatted, for example.
+        """
+        self._serde_manager.set_kwargs(extension, **kwargs)
 
     def write(self, file_name: PathLike, content: str | bytes = "") -> t.Self:
         """Write a file to the temporary file system.
@@ -34,11 +41,13 @@ class TempFs(Path):
         new_file = self / file_name
         return self._write(new_file, content)
 
-    def ser(self, file_name: PathLike, content: t.Any) -> t.Self:  # noqa: ANN401
+    def ser(self, file_name: PathLike, content: t.Any) -> t.Self:
         """Serialise content to a given file based of the type of file.
 
         Supported formats are:
             * yaml (".yml", ".yaml")
+            * toml (".toml")
+            * json (".json")
 
         Args:
             file_name: Name of the file to serialise to, must have a suffix.
@@ -52,10 +61,7 @@ class TempFs(Path):
         """
         stringy_content = None
         new_file = Path(file_name)
-        try:
-            serializer = SERIALIZERS[new_file.suffix]
-        except KeyError:
-            raise UnsupportedSerializationError(new_file.suffix) from None
+        serializer = self._serde_manager.get_serializer(new_file.suffix)
         stringy_content = serializer(content)
         return self.write(file_name, stringy_content)
 

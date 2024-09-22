@@ -20,6 +20,10 @@ def test_stuff(temp_fs_factory):
     # Serialise an object to a yaml file
     temp_fs.ser("file2.yaml", {"key": "value"})
 
+    # Serialise an object to a yaml file, with different options
+    temp_fs.set_serde_kwargs(".yaml", indent=4)
+    temp_fs.ser("file2.yaml", {"key": "value"})
+
     # Create multiple files at once, even in sub directories.
     temp_fs.gen({"subdir": {"file1": "hello world", "file2": 42}})
 ```

@@ -10,4 +10,7 @@ class UnsupportedSerializationError(GrabBagError):
 
     def __init__(self, format_name: str) -> None:
         """Initialise the exception with the invalid format name."""
-        super().__init__(f"Unsupported serialization format `{format_name}`")
+        super().__init__(
+            f"Unsupported serialization format `{format_name}`. "
+            "You can add support for yaml and toml by installing the optional extra `serde`"
+        )
