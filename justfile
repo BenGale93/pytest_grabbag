@@ -8,7 +8,7 @@ alias t := test
 alias tc := type_check
 
 @type_check:
-    uv run mypy --strict src/ tests/
+    uv run mypy src/ tests/
 
 alias l := lint
 

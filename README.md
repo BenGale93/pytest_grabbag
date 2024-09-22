@@ -17,12 +17,22 @@ def test_stuff(temp_fs_factory):
 
     assert "hello world" == new_file.read_text()
 
-    # Serialise an object to a yaml file
+    # Serialize an object to a yaml file with optional extra `serde`
     temp_fs.ser("file2.yaml", {"key": "value"})
 
-    # Serialise an object to a yaml file, with different options
+    # Serialize an object to a yaml file, with different options
     temp_fs.set_serde_kwargs(".yaml", indent=4)
     temp_fs.ser("file2.yaml", {"key": "value"})
+
+    # Serialize a pydantic model with optional extra `pydantic`
+    from pydantic import BaseModel
+
+    class A(BaseModel):
+        b: int
+        c: str
+
+    example = A(b=1, c="test")
+    result = temp_fs.ser("a.json", example)
 
     # Create multiple files at once, even in sub directories.
     temp_fs.gen({"subdir": {"file1": "hello world", "file2": 42}})

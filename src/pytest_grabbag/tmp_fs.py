@@ -42,7 +42,7 @@ class TempFs(Path):
         return self._write(new_file, content)
 
     def ser(self, file_name: PathLike, content: t.Any) -> t.Self:
-        """Serialise content to a given file based of the type of file.
+        """Serialize content to a given file based of the type of file.
 
         Supported formats are:
             * yaml (".yml", ".yaml")
@@ -50,7 +50,7 @@ class TempFs(Path):
             * json (".json")
 
         Args:
-            file_name: Name of the file to serialise to, must have a suffix.
+            file_name: Name of the file to serialize to, must have a suffix.
             content: Content to serialize.
 
         Raises:
@@ -72,7 +72,7 @@ class TempFs(Path):
         are the names of the folders/files and the values are either
         dictionaries, which represent subfolders, or the content of files.
         If the key is a file with a supported extension, the value will not
-        be interpreted as a subfolder, rather an object to serialise.
+        be interpreted as a subfolder, rather an object to serialize.
 
         Args:
             structure: The file system structure and contents.

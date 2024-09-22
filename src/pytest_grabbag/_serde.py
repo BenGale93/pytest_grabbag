@@ -18,6 +18,8 @@ class Serializer:
 
     def __call__(self, data: t.Any) -> str:
         """Serialize the given data."""
+        if hasattr(data, "__pydantic_complete__") and hasattr(data, "model_dump"):
+            data = data.model_dump()
         return self.func(data, **self.kwargs)
 
 
