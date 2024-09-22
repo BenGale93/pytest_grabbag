@@ -22,3 +22,10 @@ def test_temp_fs_write_bytes(temp_fs_factory: TempFsFactory, func_name):
 
     assert "a/b/c" in str(result)
     assert result.read_bytes() == b"d"
+
+
+def test_chdir(temp_fs_factory: TempFsFactory, func_name):
+    temp_fs = temp_fs_factory.mktemp(func_name)
+
+    with temp_fs.chdir():
+        assert temp_fs.cwd() == temp_fs

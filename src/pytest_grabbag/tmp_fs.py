@@ -2,6 +2,7 @@
 
 import os
 import typing as t
+from contextlib import contextmanager
 from pathlib import Path
 
 from pytest import TempPathFactory, fixture  # noqa: PT013
@@ -95,6 +96,16 @@ class TempFs(Path):
                 path = self._write(path, content)
             paths.append(path)
         return paths
+
+    @contextmanager
+    def chdir(self) -> t.Generator[None, None, None]:
+        """Context manager for changing the working directory to the given folder."""
+        current_working_dir = Path.cwd()
+        try:
+            os.chdir(self)
+            yield None
+        finally:
+            os.chdir(current_working_dir)
 
     def _write(self, file_name: t.Self, content: str | bytes) -> t.Self:
         file_name.parent.mkdir(parents=True, exist_ok=True)

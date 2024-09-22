@@ -36,4 +36,8 @@ def test_stuff(temp_fs_factory):
 
     # Create multiple files at once, even in sub directories.
     temp_fs.gen({"subdir": {"file1": "hello world", "file2": 42}})
+
+    # Change the working directory to the temporary file system.
+    with temp_fs.chdir():
+        pass
 ```
