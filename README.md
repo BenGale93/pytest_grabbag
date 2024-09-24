@@ -1,6 +1,8 @@
 # Pytest Grab-Bag
 
-A collection of miscellaneous pytest fixtures and plugins.
+A collection of miscellaneous pytest fixtures and plugins. Primarily aimed at
+testing CLI apps. Most features that require dependencies are behind optional
+extras so you can pick and choose what you need.
 
 ## Temporary File System
 
@@ -41,7 +43,6 @@ def test_stuff(temp_fs_factory):
     with temp_fs.chdir():
         pass
 ```
-
 
 ## Copier templates
 
