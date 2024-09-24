@@ -332,13 +332,19 @@ wheels = [
 
 [[package]]
 name = "pytest-grabbag"
-version = "0.1.dev4+g8915ae4.d20240922"
+version = "0.1.dev7+g326bf7d.d20240924"
 source = { editable = "." }
 dependencies = [
     { name = "pytest" },
 ]
 
 [package.optional-dependencies]
+all = [
+    { name = "copier" },
+    { name = "pydantic" },
+    { name = "pyyaml" },
+    { name = "rtoml" },
+]
 copier = [
     { name = "copier" },
 ]
@@ -367,6 +373,9 @@ requires-dist = [
     { name = "copier", marker = "extra == 'copier'", specifier = ">=9.3.1" },
     { name = "pydantic", marker = "extra == 'pydantic'", specifier = ">=2.9.2" },
     { name = "pytest", specifier = ">=8.3.3" },
+    { name = "pytest-grabbag", extras = ["copier"], marker = "extra == 'all'", editable = "." },
+    { name = "pytest-grabbag", extras = ["pydantic"], marker = "extra == 'all'", editable = "." },
+    { name = "pytest-grabbag", extras = ["serde"], marker = "extra == 'all'", editable = "." },
     { name = "pytest-grabbag", extras = ["serde"], marker = "extra == 'pydantic'", editable = "." },
     { name = "pyyaml", marker = "extra == 'serde'", specifier = ">=6.0.2" },
     { name = "rtoml", marker = "extra == 'serde'", specifier = ">=0.11.0" },
