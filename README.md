@@ -41,3 +41,24 @@ def test_stuff(temp_fs_factory):
     with temp_fs.chdir():
         pass
 ```
+
+
+## Copier templates
+
+It can be useful to define folder structures using a copier template and then
+run tests from within. Add the optional extra `copier` and you can easily
+render these templates from within a test.
+
+```python
+def test_copier_stuff(templates, temp_fs_factory):
+    tmp_fs = temp_fs_factory.mktemp(func_name)
+
+    templates.render(
+        "folder_template_is_in",
+        tmp_fs,
+        project_name="test_project",
+        module_name="test_module"
+    )
+
+    assert (tmp_fs / "test_project").exists()
+```

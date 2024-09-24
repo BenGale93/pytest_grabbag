@@ -18,10 +18,8 @@ pytest_grabbag = "pytest_grabbag"
 
 [project.optional-dependencies]
 serde = ["pyyaml>=6.0.2", "rtoml>=0.11.0"]
-pydantic = [
-    "pydantic>=2.9.2",
-    "pytest-grabbag[serde]",
-]
+pydantic = ["pydantic>=2.9.2", "pytest-grabbag[serde]"]
+copier = ["copier>=9.3.1"]
 
 [tool.uv]
 dev-dependencies = [
@@ -39,6 +37,9 @@ pytest-grabbag = { workspace = true }
 [tool.ruff]
 line-length = 120
 target-version = "py312"
+
+[tool.ruff.format]
+docstring-code-format = true
 
 [tool.ruff.lint]
 select = ["ALL"]
