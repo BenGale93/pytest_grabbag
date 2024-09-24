@@ -51,14 +51,14 @@ render these templates from within a test.
 
 ```python
 def test_copier_stuff(templates, temp_fs_factory):
-    tmp_fs = temp_fs_factory.mktemp(func_name)
+    temp_fs = temp_fs_factory.mktemp(func_name)
 
     templates.render(
         "folder_template_is_in",
-        tmp_fs,
+        temp_fs,
         project_name="test_project",
         module_name="test_module"
     )
 
-    assert (tmp_fs / "test_project").exists()
+    assert (temp_fs / "test_project").exists()
 ```

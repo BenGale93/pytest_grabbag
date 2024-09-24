@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from pytest_grabbag import _dependencies, exceptions, tmp_fs
+from pytest_grabbag import _dependencies, exceptions, temp_fs
 
 
 class TemplateManager:
@@ -20,7 +20,7 @@ class TemplateManager:
         """The dictionary of available templates."""
         return self._templates
 
-    def render(self, template_name: str, target_dir: tmp_fs.TempFs, **template_data: t.Any) -> None:
+    def render(self, template_name: str, target_dir: temp_fs.TempFs, **template_data: t.Any) -> None:
         """Render the template with the given name in the target directory.
 
         Args:
