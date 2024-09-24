@@ -1,6 +1,8 @@
+import sys
+
 import pytest
 
-from pytest_grabbag import TempFsFactory
+from pytest_grabbag import TempFsFactory, _serde
 from pytest_grabbag.exceptions import UnsupportedSerializationError
 
 
@@ -139,3 +141,19 @@ def test_serde_pydantic_yaml(temp_fs_factory: TempFsFactory, func_name) -> None:
     loaded_example = A.model_validate(load(contents, Loader=Loader))
 
     assert example == loaded_example
+
+
+def test_toml_not_available(monkeypatch):
+    with monkeypatch.context() as m:
+        m.setitem(sys.modules, "rtoml", None)
+        sm = _serde.SerializationManager()
+        with pytest.raises(UnsupportedSerializationError, match="toml"):
+            sm.get_serializer(".toml")
+
+
+def test_yaml_not_available(monkeypatch):
+    with monkeypatch.context() as m:
+        m.setitem(sys.modules, "yaml", None)
+        sm = _serde.SerializationManager()
+        with pytest.raises(UnsupportedSerializationError, match="yaml"):
+            sm.get_serializer(".yaml")

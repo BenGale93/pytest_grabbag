@@ -1,5 +1,6 @@
 """Utilities for serializing and deserializing data structures."""
 
+import contextlib
 import json
 import typing as t
 
@@ -33,18 +34,15 @@ class SerializationManager:
         self._serializers: dict[str, Serializer] = {
             ".json": Serializer(json.dumps),
         }
-        try:
+        with contextlib.suppress(ModuleNotFoundError):
             import rtoml
 
             self._serializers[".toml"] = Serializer(rtoml.dumps)
-        except ModuleNotFoundError:  # pragma: no cover
-            pass
-        try:
+
+        with contextlib.suppress(ModuleNotFoundError):
             import yaml
 
             self._serializers[".yaml"] = Serializer(yaml.dump)
-        except ModuleNotFoundError:  # pragma: no cover
-            pass
 
     def get_serializer(self, extension: str) -> Serializer:
         """Get the desired serializer depending on the file extension."""
