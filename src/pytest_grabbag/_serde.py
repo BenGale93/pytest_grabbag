@@ -2,11 +2,12 @@
 
 import contextlib
 import json
+import pickle
 import typing as t
 
 from pytest_grabbag.exceptions import UnsupportedSerializationError
 
-SerializerFunction = t.Callable[[t.Any], str]
+SerializerFunction = t.Callable[[t.Any], str | bytes]
 
 
 class Serializer:
@@ -17,7 +18,7 @@ class Serializer:
         self.func = func
         self.kwargs: dict[str, t.Any] = {}
 
-    def __call__(self, data: t.Any) -> str:
+    def __call__(self, data: t.Any) -> str | bytes:
         """Serialize the given data."""
         if hasattr(data, "__pydantic_complete__") and hasattr(data, "model_dump"):
             data = data.model_dump()
@@ -27,12 +28,13 @@ class Serializer:
 class SerializationManager:
     """Class for managing serializers and their settings."""
 
-    _aliases: t.ClassVar[dict[str, str]] = {".yml": ".yaml"}
+    _aliases: t.ClassVar[dict[str, str]] = {".yml": ".yaml", ".pickle": ".pkl"}
 
     def __init__(self) -> None:
         """Initialise the available serializers depending on optional extras."""
         self._serializers: dict[str, Serializer] = {
             ".json": Serializer(json.dumps),
+            ".pkl": Serializer(pickle.dumps),
         }
         with contextlib.suppress(ModuleNotFoundError):
             import rtoml

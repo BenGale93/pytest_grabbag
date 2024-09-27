@@ -49,6 +49,7 @@ class TempFs(Path):
             * yaml (".yml", ".yaml")
             * toml (".toml")
             * json (".json")
+            * pickle (".pkl", ".pickle")
 
         Args:
             file_name: Name of the file to serialize to, must have a suffix.

@@ -1,9 +1,19 @@
+import pickle
 import sys
 
 import pytest
 
 from pytest_grabbag import TempFsFactory, _serde
 from pytest_grabbag.exceptions import UnsupportedSerializationError
+
+
+def test_temp_fs_ser_to_pickle(temp_fs_factory: TempFsFactory, func_name) -> None:
+    temp_fs = temp_fs_factory.mktemp(func_name)
+
+    test_input = {"test": "content"}
+    result = temp_fs.ser("p.pkl", test_input)
+
+    assert pickle.loads(result.read_bytes()) == test_input
 
 
 def test_temp_fs_ser_to_yaml(temp_fs_factory: TempFsFactory, func_name) -> None:
