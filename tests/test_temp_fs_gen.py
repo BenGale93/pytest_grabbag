@@ -43,6 +43,16 @@ def test_temp_fs_gen_to_any_file_if_string(temp_fs_factory: TempFsFactory, func_
     assert (temp_fs / "test.py").read_text() == "print('hello world!')"
 
 
+def test_temp_fs_gen_to_any_file_if_binary(temp_fs_factory: TempFsFactory, func_name):
+    temp_fs = temp_fs_factory.mktemp(func_name)
+
+    content = b"0\x00\x00\x00\x00\x00"
+
+    temp_fs.gen({"test.exe": content})
+
+    assert (temp_fs / "test.exe").read_bytes() == content
+
+
 def test_temp_fs_gen_to_unrecognised_serde_fails(temp_fs_factory: TempFsFactory, func_name):
     temp_fs = temp_fs_factory.mktemp(func_name)
 
