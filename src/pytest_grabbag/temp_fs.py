@@ -86,7 +86,7 @@ class TempFs(Path):
         paths = []
         for name, content in structure.items():
             path = (prefix or self) / name
-            if path.suffix:
+            if path.suffix and not isinstance(content, str):
                 self.ser(path, content)
             elif isinstance(content, dict):
                 if not content:
