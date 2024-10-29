@@ -46,7 +46,7 @@ jobs:
         run: uv sync --only-group lint
 
       - name: Run ruff
-        run: uv run --no-sync ruff format .
+        run: uv run --no-sync ruff format . --check
 
   typing:
     runs-on: ubuntu-latest
@@ -93,4 +93,17 @@ jobs:
         run: uv sync --group test --no-dev --all-extras
 
       - name: Run tests
-        run: COV_CORE_SOURCE=src COV_CORE_CONFIG=pyproject.toml COV_CORE_DATAFILE=.coverage.eager uv run --no-sync pytest
+        run: COV_CORE_SOURCE=src COV_CORE_CONFIG=pyproject.toml COV_CORE_DATAFILE=.coverage.eager uv run --no-sync pytest tests/
+
+      - name: Deal with coverage
+        run: |
+          uv run --no-sync coverage html --skip-covered --skip-empty
+          uv run --no-sync coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
+          uv run --no-sync coverage report --fail-under=100
+
+      - name: Upload HTML report if check failed.
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-report
+          path: htmlcov
+        if: ${{ failure() }}

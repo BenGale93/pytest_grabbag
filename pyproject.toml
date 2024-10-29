@@ -78,11 +78,10 @@ disallow_incomplete_defs = false
 
 [tool.coverage.report]
 exclude_also = ["if t.TYPE_CHECKING", "@t.overload", "@abstractmethod"]
-fail_under = 100
 show_missing = true
 
 [tool.coverage.run]
 branch = true
 
 [tool.pytest.ini_options]
-addopts = "--cov=src/ --cov-append"
+addopts = "--cov=src/ --cov-append --cov-report="

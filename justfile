@@ -4,6 +4,7 @@ alias t := test
 
 @test:
     COV_CORE_SOURCE=src COV_CORE_CONFIG=pyproject.toml COV_CORE_DATAFILE=.coverage.eager uv run pytest
+    uv run coverage report --fail-under=100
 
 alias tc := type_check
 
