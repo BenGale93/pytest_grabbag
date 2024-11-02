@@ -2,6 +2,7 @@ name: CI
 
 env:
   MINIMUM_PYTHON: "3.12"
+  PYTHON_VERSIONS: '["3.12"]'
 
 on:
   push:
@@ -66,13 +67,13 @@ jobs:
       - name: Run type checking
         run: uv run --no-sync mypy src/ tests/
 
-  test:
-    name: test py${{ matrix.python }} on ${{ matrix.os }}
+  test-lower-bound:
+    name: test-lower-bound py${{ matrix.python }} on ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python: ["3.12"]
+        python: ${{ fromJSON(vars.PYTHON_VERSIONS) }}
 
     env:
       PYTHON: ${{ matrix.python }}
@@ -107,3 +108,32 @@ jobs:
           name: html-report
           path: htmlcov
         if: ${{ failure() }}
+
+  test-upper-bound:
+    name: test-upper-bound py${{ matrix.python }} on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ${{ fromJSON(vars.PYTHON_VERSIONS) }}
+
+    env:
+      PYTHON: ${{ matrix.python }}
+      OS: ${{ matrix.os }}
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Set up Python
+        run: uv python install ${{ matrix.python}}
+
+      - name: Install the project
+        run: uv sync --resolution highest --group test --no-dev --all-extras
+
+      - name: Run tests
+        run: uv run --no-sync pytest tests/
