@@ -1,60 +1,45 @@
 import pytest
 
-from pytest_grabbag import TempFsFactory
 from pytest_grabbag.exceptions import UnsupportedSerializationError
 
 
-def test_temp_fs_gen_simple(temp_fs_factory: TempFsFactory, func_name) -> None:
-    temp_fs = temp_fs_factory.mktemp(func_name)
+def test_temp_fs_gen_simple(named_temp_fs) -> None:
+    named_temp_fs.gen({"a": "test"})
 
-    temp_fs.gen({"a": "test"})
-
-    assert (temp_fs / "a").read_text() == "test"
+    assert (named_temp_fs / "a").read_text() == "test"
 
 
-def test_temp_fs_gen_recursive(temp_fs_factory: TempFsFactory, func_name) -> None:
-    temp_fs = temp_fs_factory.mktemp(func_name)
+def test_temp_fs_gen_recursive(named_temp_fs) -> None:
+    named_temp_fs.gen({"a": {"b": "test"}})
 
-    temp_fs.gen({"a": {"b": "test"}})
-
-    assert (temp_fs / "a" / "b").read_text() == "test"
+    assert (named_temp_fs / "a" / "b").read_text() == "test"
 
 
-def test_temp_fs_gen_empty_dict(temp_fs_factory: TempFsFactory, func_name) -> None:
-    temp_fs = temp_fs_factory.mktemp(func_name)
+def test_temp_fs_gen_empty_dict(named_temp_fs) -> None:
+    named_temp_fs.gen({"a": {}})
 
-    temp_fs.gen({"a": {}})
-
-    assert (temp_fs / "a").is_dir()
+    assert (named_temp_fs / "a").is_dir()
 
 
-def test_temp_fs_gen_yaml(temp_fs_factory: TempFsFactory, func_name) -> None:
-    temp_fs = temp_fs_factory.mktemp(func_name)
-
-    temp_fs.gen({"a.yaml": {"test": "content"}})
-    assert (temp_fs / "a.yaml").read_text() == "test: content\n"
+def test_temp_fs_gen_yaml(named_temp_fs) -> None:
+    named_temp_fs.gen({"a.yaml": {"test": "content"}})
+    assert (named_temp_fs / "a.yaml").read_text() == "test: content\n"
 
 
-def test_temp_fs_gen_to_any_file_if_string(temp_fs_factory: TempFsFactory, func_name):
-    temp_fs = temp_fs_factory.mktemp(func_name)
+def test_temp_fs_gen_to_any_file_if_string(named_temp_fs):
+    named_temp_fs.gen({"test.py": "print('hello world!')"})
 
-    temp_fs.gen({"test.py": "print('hello world!')"})
-
-    assert (temp_fs / "test.py").read_text() == "print('hello world!')"
+    assert (named_temp_fs / "test.py").read_text() == "print('hello world!')"
 
 
-def test_temp_fs_gen_to_any_file_if_binary(temp_fs_factory: TempFsFactory, func_name):
-    temp_fs = temp_fs_factory.mktemp(func_name)
-
+def test_temp_fs_gen_to_any_file_if_binary(named_temp_fs):
     content = b"0\x00\x00\x00\x00\x00"
 
-    temp_fs.gen({"test.exe": content})
+    named_temp_fs.gen({"test.exe": content})
 
-    assert (temp_fs / "test.exe").read_bytes() == content
+    assert (named_temp_fs / "test.exe").read_bytes() == content
 
 
-def test_temp_fs_gen_to_unrecognised_serde_fails(temp_fs_factory: TempFsFactory, func_name):
-    temp_fs = temp_fs_factory.mktemp(func_name)
-
+def test_temp_fs_gen_to_unrecognised_serde_fails(named_temp_fs):
     with pytest.raises(UnsupportedSerializationError):
-        temp_fs.gen({"test.py": 0})
+        named_temp_fs.gen({"test.py": 0})

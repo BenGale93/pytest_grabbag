@@ -44,6 +44,22 @@ def test_stuff(temp_fs_factory):
         pass
 ```
 
+You can also immediately get a `TempFs` instance with the root name the same as
+the test function.
+
+```python
+def test_creation_of_html(named_temp_fs):
+    foo = Foo()
+
+    with temp_fs.chdir():
+        foo.to_html()
+```
+
+This is particularly useful if you want to visually inspect the output of a
+test function. If you navigate to
+`/tmp/pytest-of-$USER/pytest-$NUMBER/test_creation_of_html/` or equivalent, you
+can see the actual HTML file that was generated.
+
 ## Copier templates
 
 It can be useful to define folder structures using a copier template and then
@@ -51,15 +67,13 @@ run tests from within. Add the optional extra `copier` and you can easily
 render these templates from within a test.
 
 ```python
-def test_copier_stuff(templates, temp_fs_factory):
-    temp_fs = temp_fs_factory.mktemp(func_name)
-
+def test_copier_stuff(templates, named_temp_fs):
     templates.render(
         "folder_template_is_in",
-        temp_fs,
+        named_temp_fs,
         project_name="test_project",
         module_name="test_module"
     )
 
-    assert (temp_fs / "test_project").exists()
+    assert (named_temp_fs / "test_project").exists()
 ```
