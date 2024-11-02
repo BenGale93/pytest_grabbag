@@ -7,60 +7,50 @@ from pytest_grabbag import TempFsFactory, _serde
 from pytest_grabbag.exceptions import UnsupportedSerializationError
 
 
-def test_temp_fs_ser_to_pickle(temp_fs_factory: TempFsFactory, func_name) -> None:
-    temp_fs = temp_fs_factory.mktemp(func_name)
-
+def test_temp_fs_ser_to_pickle(named_temp_fs) -> None:
     test_input = {"test": "content"}
-    result = temp_fs.ser("p.pkl", test_input)
+    result = named_temp_fs.ser("p.pkl", test_input)
 
     assert pickle.loads(result.read_bytes()) == test_input
 
 
-def test_temp_fs_ser_to_yaml(temp_fs_factory: TempFsFactory, func_name) -> None:
-    temp_fs = temp_fs_factory.mktemp(func_name)
-
-    result = temp_fs.ser("a/b/c.yaml", {"test": "content"})
+def test_temp_fs_ser_to_yaml(named_temp_fs) -> None:
+    result = named_temp_fs.ser("a/b/c.yaml", {"test": "content"})
 
     assert "a/b/c" in str(result)
     assert result.read_text() == "test: content\n"
 
 
-def test_temp_fs_ser_to_yml(temp_fs_factory: TempFsFactory, func_name) -> None:
-    temp_fs = temp_fs_factory.mktemp(func_name)
-
-    result = temp_fs.ser("a/b/c.yml", {"test": "content"})
+def test_temp_fs_ser_to_yml(named_temp_fs) -> None:
+    result = named_temp_fs.ser("a/b/c.yml", {"test": "content"})
 
     assert "a/b/c" in str(result)
     assert result.read_text() == "test: content\n"
 
 
-def test_temp_fs_ser_to_toml(temp_fs_factory: TempFsFactory, func_name) -> None:
-    temp_fs = temp_fs_factory.mktemp(func_name)
-
-    result = temp_fs.ser("a/b/c.toml", {"test": "content"})
+def test_temp_fs_ser_to_toml(named_temp_fs) -> None:
+    result = named_temp_fs.ser("a/b/c.toml", {"test": "content"})
 
     assert "a/b/c" in str(result)
     assert result.read_text() == 'test = "content"\n'
 
 
-def test_temp_fs_ser_to_json(temp_fs_factory: TempFsFactory, func_name) -> None:
-    temp_fs = temp_fs_factory.mktemp(func_name)
-
-    result = temp_fs.ser("a/b/c.json", {"test": "content"})
+def test_temp_fs_ser_to_json(named_temp_fs) -> None:
+    result = named_temp_fs.ser("a/b/c.json", {"test": "content"})
 
     assert "a/b/c" in str(result)
     assert result.read_text() == '{"test": "content"}'
 
 
-def test_temp_fs_ser_fail(temp_fs_factory: TempFsFactory, func_name) -> None:
-    temp_fs = temp_fs_factory.mktemp(func_name)
+def test_temp_fs_ser_fail(temp_fs_factory: TempFsFactory, function_name) -> None:
+    temp_fs = temp_fs_factory.mktemp(function_name)
 
     with pytest.raises(UnsupportedSerializationError, match=".txt"):
         temp_fs.ser("a.txt", {"test": "content"})
 
 
-def test_temp_fs_ser_to_yaml_settings(temp_fs_factory: TempFsFactory, func_name) -> None:
-    temp_fs = temp_fs_factory.mktemp(func_name)
+def test_temp_fs_ser_to_yaml_settings(temp_fs_factory: TempFsFactory, function_name) -> None:
+    temp_fs = temp_fs_factory.mktemp(function_name)
 
     temp_fs.set_serde_kwargs(".yaml", indent=4)
     result = temp_fs.ser("a.yaml", {"test": {"content": "content"}})
@@ -73,27 +63,27 @@ def test_temp_fs_ser_to_yaml_settings(temp_fs_factory: TempFsFactory, func_name)
     assert result.read_text() == "test:\n  content: content\n"
 
 
-def test_settings_only_apply_to_a_single_temp_fs(temp_fs_factory: TempFsFactory, func_name) -> None:
+def test_settings_only_apply_to_a_single_temp_fs(temp_fs_factory: TempFsFactory, function_name) -> None:
     content = {"test": {"content": "content"}}
-    temp_fs = temp_fs_factory.mktemp(func_name)
+    temp_fs = temp_fs_factory.mktemp(function_name)
 
     temp_fs.set_serde_kwargs(".yaml", indent=4)
     result = temp_fs.ser("a.yaml", content)
 
-    temp_fs2 = temp_fs_factory.mktemp(func_name)
+    temp_fs2 = temp_fs_factory.mktemp(function_name)
     result2 = temp_fs2.ser("b.yaml", content)
 
     assert result.read_text() != result2.read_text()
 
 
-def test_temp_fs_fake_serde_settings(temp_fs_factory: TempFsFactory, func_name) -> None:
-    temp_fs = temp_fs_factory.mktemp(func_name)
+def test_temp_fs_fake_serde_settings(temp_fs_factory: TempFsFactory, function_name) -> None:
+    temp_fs = temp_fs_factory.mktemp(function_name)
 
     with pytest.raises(UnsupportedSerializationError, match=".fake"):
         temp_fs.set_serde_kwargs(".fake", indent=4)
 
 
-def test_serde_pydantic_base_model(temp_fs_factory: TempFsFactory, func_name) -> None:
+def test_serde_pydantic_base_model(temp_fs_factory: TempFsFactory, function_name) -> None:
     from pydantic import BaseModel
 
     class A(BaseModel):
@@ -102,7 +92,7 @@ def test_serde_pydantic_base_model(temp_fs_factory: TempFsFactory, func_name) ->
 
     example = A(b=1, c="test")
 
-    temp_fs = temp_fs_factory.mktemp(func_name)
+    temp_fs = temp_fs_factory.mktemp(function_name)
 
     result = temp_fs.ser("a.json", example)
 
@@ -115,7 +105,7 @@ def test_serde_pydantic_base_model(temp_fs_factory: TempFsFactory, func_name) ->
     assert example == loaded_example
 
 
-def test_serde_pydantic_model_root_model(temp_fs_factory: TempFsFactory, func_name) -> None:
+def test_serde_pydantic_model_root_model(temp_fs_factory: TempFsFactory, function_name) -> None:
     from pydantic import RootModel
 
     class A(RootModel[dict[str, str]]):
@@ -123,14 +113,14 @@ def test_serde_pydantic_model_root_model(temp_fs_factory: TempFsFactory, func_na
 
     example = A({"test": "root"})
 
-    temp_fs = temp_fs_factory.mktemp(func_name)
+    temp_fs = temp_fs_factory.mktemp(function_name)
 
     result = temp_fs.ser("a.json", example)
 
     assert result.read_text() == '{"test": "root"}'
 
 
-def test_serde_pydantic_yaml(temp_fs_factory: TempFsFactory, func_name) -> None:
+def test_serde_pydantic_yaml(temp_fs_factory: TempFsFactory, function_name) -> None:
     from pydantic import BaseModel
     from yaml import Loader, load
 
@@ -140,7 +130,7 @@ def test_serde_pydantic_yaml(temp_fs_factory: TempFsFactory, func_name) -> None:
 
     example = A(b=1, c="test")
 
-    temp_fs = temp_fs_factory.mktemp(func_name)
+    temp_fs = temp_fs_factory.mktemp(function_name)
 
     result = temp_fs.ser("a.yaml", example)
 

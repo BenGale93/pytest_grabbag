@@ -5,7 +5,7 @@ import typing as t
 from contextlib import contextmanager
 from pathlib import Path
 
-from pytest import TempPathFactory, fixture  # noqa: PT013
+from pytest import FixtureRequest, TempPathFactory, fixture  # noqa: PT013
 
 from pytest_grabbag._serde import SerializationManager
 
@@ -124,9 +124,9 @@ class TempFsFactory:
         """Initialise the factory with the pytest TempPathFactory to use."""
         self.factory = factory
 
-    def mktemp(self, basename: str) -> TempFs:
+    def mktemp(self, basename: str, *, numbered: bool = True) -> TempFs:
         """Makes a temporary root folder with a given name."""
-        return TempFs(self.factory.mktemp(basename))
+        return TempFs(self.factory.mktemp(basename, numbered=numbered))
 
 
 @fixture(scope="session")
@@ -136,3 +136,15 @@ def temp_fs_factory(tmp_path_factory: TempPathFactory) -> TempFsFactory:
     Wraps the pytest fixture `tmp_path_factory`.
     """
     return TempFsFactory(tmp_path_factory)
+
+
+@fixture
+def function_name(request: FixtureRequest) -> str:
+    """Fixture returning the name of the test function."""
+    return str(request.node.name)
+
+
+@fixture
+def named_temp_fs(temp_fs_factory: TempFsFactory, function_name: str) -> TempFs:
+    """Temporary file system named the same as the test function."""
+    return temp_fs_factory.mktemp(function_name, numbered=False)
