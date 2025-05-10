@@ -22,8 +22,7 @@ class MissingExtraError(GrabBagError):
     def __init__(self, module_name: str, extra_name: str) -> None:
         """Initialise the exception with the missing extra."""
         super().__init__(
-            f"The module `{module_name}` is missing. "
-            f"You can install it with `pip install pytest-grabbag[{extra_name}]`"
+            f"The module `{module_name}` is missing. You can install it with `pip install pytest-grabbag[{extra_name}]`"
         )
 
 
